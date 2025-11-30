@@ -28,10 +28,12 @@ class FinancialController extends Controller
         $startDate = $request->input('start_date', now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->input('end_date', now()->format('Y-m-d'));
 
-        $records = $this->financialRecordRepository->getByTerminalAndDateRange(
+        $perPage = $request->input('per_page', 10);
+        $records = $this->financialRecordRepository->getPaginatedByTerminalAndDateRange(
             $user->terminal_id,
             $startDate,
-            $endDate
+            $endDate,
+            $perPage
         );
 
         $summary = $this->financialRecordRepository->getFinancialSummary(
@@ -40,13 +42,16 @@ class FinancialController extends Controller
             $endDate
         );
 
+        $terminal = $user->terminal_id ? \App\Models\Terminal::find($user->terminal_id) : null;
         return Inertia::render('Terminal/Financial/Index', [
             'records' => $records,
             'summary' => $summary,
             'filters' => [
                 'start_date' => $startDate,
                 'end_date' => $endDate,
+                'per_page' => $perPage,
             ],
+            'terminal' => $terminal,
         ]);
     }
 

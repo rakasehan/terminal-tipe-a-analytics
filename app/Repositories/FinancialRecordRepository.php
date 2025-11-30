@@ -7,6 +7,16 @@ use Illuminate\Database\Eloquent\Collection;
 
 class FinancialRecordRepository extends BaseRepository
 {
+    /**
+     * Get paginated records by terminal and date range
+     */
+    public function getPaginatedByTerminalAndDateRange(int $terminalId, string $startDate, string $endDate, int $perPage = 10)
+    {
+        return $this->model->where('terminal_id', $terminalId)
+            ->dateRange($startDate, $endDate)
+            ->orderBy('date', 'desc')
+            ->paginate($perPage);
+    }
     public function __construct(FinancialRecord $model)
     {
         parent::__construct($model);
